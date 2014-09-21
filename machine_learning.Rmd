@@ -1,0 +1,176 @@
+Practical Machine Learning
+========================================================
+
+Wearable computing is one of hottest fields nowadays as it allows the collection
+of large amount of data rather inexpensively. However, due to raw nature of the
+data from the device, it is necessary to process them before it is possible to
+make some some predictions about the activity that an individual is carrying out.
+
+Here, we have a dataset of 
+
+# Reading in of Data
+
+```{r}
+library(caret)
+require(randomForest)
+
+# Read in the data
+pml.training<-read.csv("pml-training.csv",header=T)
+pml.testing<-read.csv("pml-testing.csv",header=T)
+```
+
+# Data Cleaning
+
+We will first perform some data checking on the training dataset.
+```{r}
+table(apply(is.na(pml.training),2,sum))
+
+nrow(pml.training)
+```
+From the above, we notice that 67 columns have 19216 NA values while the rest of the 93
+columns do not have 0 values. 
+
+This indicates that 19216/19622 of the rows in some of the columns have missing information
+and they will not provide us much valuable information in doing our prediction. As such, we 
+will remove the redundant columns and retainonly those columns which contain the information
+we want.
+
+
+```{r}
+# Extract columns which have fewer than 1000 "NA" values
+clean.index<-which(apply(is.na(pml.training),2,sum) < 1000)
+pml.training.clean<-pml.training[, clean.index]
+pml.testing.clean<-pml.testing[, clean.index]
+```
+
+We can now look at the summary of the clean data.
+
+```{r}
+summary(pml.training.clean)
+```
+
+Based on the summary, we can also notice that alot of fields
+are basically empty and we will remove these columns as well.
+
+```{r}
+emptyindex<-apply(pml.training.clean, 2, function(x){
+  sum(x == "") > 1000
+  })
+
+pml.training.cleaner<-pml.training.clean[,!emptyindex]
+pml.testing.cleaner<-pml.testing.clean[, !emptyindex]
+```
+
+From the summary, we also note that the first 6 columns do not provide very
+descriptive information about the row, we will drop these columns as well.
+
+```{r}
+# Remove the first 6 columns because they carry not very useful information
+pml.training.cleaner<-pml.training.cleaner[,-c(1:6)]
+pml.testing.cleaner<-pml.testing.cleaner[,-c(1:6)]
+```
+
+# Create Data partition
+
+Now, we will will split the training data we have into two sets, a training set
+and a testing set. We will retain 70% in the training set for model building and 
+use 30% for testing
+```{r}
+inTrain<-createDataPartition(pml.training.cleaner$classe, p=0.7, list=FALSE)
+training<-pml.training.cleaner[inTrain,]
+testing<-pml.training.cleaner[-inTrain,]
+```
+
+# Random Forest Models
+
+## Cross Validation
+To estimate the in sample accuracy, we will make use of the K-fold cross validation
+method (specifically, 4-fold). 
+
+```{r, cache=TRUE}
+# We will perform 4-fold cross validation here
+set.seed(12345)
+foldnum<-4
+folds<-createFolds(y=training$classe, k=foldnum, list=TRUE, returnTrain=TRUE)
+
+models_all<-list()
+crossval_results<-c()
+
+for (i in 1:foldnum){
+  training.itrain<-training[folds[[i]],]
+  training.itest<-training[-folds[[i]],]
+  model_i <- randomForest(classe~.,data=training.itrain)
+  models_all[[i]]<-model_i
+  
+  crossvalidation_results<-confusionMatrix(predict(model_i, training.itest), training.itest$classe)$overall
+  crossval_results<-rbind(crossval_results, crossvalidation_results)
+}
+
+# Results of the different models we have
+crossval_results
+```
+
+From the above, we can have a look at teh accuracy of each cross validation models. The accuracy of all models
+seem to be fairly high and robust.
+
+## Model Selection
+
+Using 4-fold cross validation, we would have 4 different models. We would select the model that gave the highest
+accuracy as our best model.
+
+```{r}
+# Select the model which can 
+bestmod_index<-which(crossval_results[,1] == max(crossval_results[,1]))
+bestmodel<-models_all[[bestmod_index]]
+
+
+
+```
+
+
+# In-sample Error
+
+Now, since we have our best model, we can test it once again to see the in-sample
+error of our model.
+
+```{r}
+confusionMatrix(predict(bestmodel, training), training$classe)
+```
+
+As can be seen, our model works rather well on our training data
+
+# Out-of-sample Error
+
+We can also estimate how well our model works on the test dataset.
+
+```{r}
+confusionMatrix(predict(bestmodel, testing), testing$classe)
+```
+
+As seen above, our model works very well on the test dataset.
+
+
+# Prediction of Activity
+
+With the model we have built, we can then try to predict the activity in the pml.test set.
+
+```{r}
+results<-predict(bestmodel, pml.testing.cleaner)
+results
+```
+
+# Writing of files to text
+
+```{r}
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+
+pml_write_files(as.character(results))
+
+```
