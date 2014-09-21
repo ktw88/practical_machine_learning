@@ -6,7 +6,8 @@ of large amount of data rather inexpensively. However, due to raw nature of the
 data from the device, it is necessary to process them before it is possible to
 make some some predictions about the activity that an individual is carrying out.
 
-Here, we have a dataset of 
+Here, we have a dataset from these instruments and we need to make predictions of 
+what activity these individuals are doing based on the data.
 
 # Reading in of Data
 

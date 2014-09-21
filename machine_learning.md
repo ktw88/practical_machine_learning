@@ -6,7 +6,8 @@ of large amount of data rather inexpensively. However, due to raw nature of the
 data from the device, it is necessary to process them before it is possible to
 make some some predictions about the activity that an individual is carrying out.
 
-Here, we have a dataset of 
+Here, we have a dataset from these instruments and we need to make predictions of 
+what activity these individuals are doing based on the data.
 
 # Reading in of Data
 
@@ -401,11 +402,11 @@ confusionMatrix(predict(bestmodel, training), training$classe)
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 3906    1    0    0    0
-##          B    0 2657    3    0    0
-##          C    0    0 2392    6    0
-##          D    0    0    1 2246    4
-##          E    0    0    0    0 2521
+##          A 3906    0    0    0    0
+##          B    0 2658    4    0    0
+##          C    0    0 2390    6    0
+##          D    0    0    2 2246    2
+##          E    0    0    0    0 2523
 ## 
 ## Overall Statistics
 ##                                         
@@ -420,14 +421,14 @@ confusionMatrix(predict(bestmodel, training), training$classe)
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity             1.000    1.000    0.998    0.997    0.998
+## Sensitivity             1.000    1.000    0.997    0.997    0.999
 ## Specificity             1.000    1.000    0.999    1.000    1.000
-## Pos Pred Value          1.000    0.999    0.997    0.998    1.000
-## Neg Pred Value          1.000    1.000    1.000    0.999    1.000
+## Pos Pred Value          1.000    0.998    0.997    0.998    1.000
+## Neg Pred Value          1.000    1.000    0.999    0.999    1.000
 ## Prevalence              0.284    0.193    0.174    0.164    0.184
 ## Detection Rate          0.284    0.193    0.174    0.164    0.184
-## Detection Prevalence    0.284    0.194    0.175    0.164    0.184
-## Balanced Accuracy       1.000    1.000    0.999    0.998    0.999
+## Detection Prevalence    0.284    0.194    0.174    0.164    0.184
+## Balanced Accuracy       1.000    1.000    0.998    0.998    1.000
 ```
 
 As can be seen, our model works rather well on our training data
@@ -446,33 +447,33 @@ confusionMatrix(predict(bestmodel, testing), testing$classe)
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1674    0    0    0    0
-##          B    0 1139    5    0    0
-##          C    0    0 1020    4    0
-##          D    0    0    1  960    1
-##          E    0    0    0    0 1081
+##          A 1674    1    0    0    0
+##          B    0 1138    4    0    0
+##          C    0    0 1022    4    0
+##          D    0    0    0  960    3
+##          E    0    0    0    0 1079
 ## 
 ## Overall Statistics
 ##                                         
 ##                Accuracy : 0.998         
-##                  95% CI : (0.997, 0.999)
+##                  95% CI : (0.996, 0.999)
 ##     No Information Rate : 0.284         
 ##     P-Value [Acc > NIR] : <2e-16        
 ##                                         
-##                   Kappa : 0.998         
+##                   Kappa : 0.997         
 ##  Mcnemar's Test P-Value : NA            
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity             1.000    1.000    0.994    0.996    0.999
-## Specificity             1.000    0.999    0.999    1.000    1.000
-## Pos Pred Value          1.000    0.996    0.996    0.998    1.000
-## Neg Pred Value          1.000    1.000    0.999    0.999    1.000
+## Sensitivity             1.000    0.999    0.996    0.996    0.997
+## Specificity             1.000    0.999    0.999    0.999    1.000
+## Pos Pred Value          0.999    0.996    0.996    0.997    1.000
+## Neg Pred Value          1.000    1.000    0.999    0.999    0.999
 ## Prevalence              0.284    0.194    0.174    0.164    0.184
-## Detection Rate          0.284    0.194    0.173    0.163    0.184
-## Detection Prevalence    0.284    0.194    0.174    0.163    0.184
-## Balanced Accuracy       1.000    0.999    0.997    0.998    1.000
+## Detection Rate          0.284    0.193    0.174    0.163    0.183
+## Detection Prevalence    0.285    0.194    0.174    0.164    0.183
+## Balanced Accuracy       1.000    0.999    0.998    0.998    0.999
 ```
 
 As seen above, our model works very well on the test dataset.
