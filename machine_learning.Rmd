@@ -111,7 +111,7 @@ for (i in 1:foldnum){
 crossval_results
 ```
 
-From the above, we can have a look at teh accuracy of each cross validation models. The accuracy of all models
+From the above, we can have a look at the accuracy of each cross validation models. The accuracy of all models
 seem to be fairly high and robust.
 
 ## Model Selection
